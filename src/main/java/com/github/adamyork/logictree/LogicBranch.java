@@ -1,25 +1,26 @@
 package com.github.adamyork.logictree;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 @SuppressWarnings("WeakerAccess")
-public class LogicBranch implements Function<Object, Void> {
+public class LogicBranch implements Consumer<Object> {
 
     private boolean condition;
-    private List<Function<Object, Void>> left;
-    private List<Function<Object, Void>> right;
+    private List<Consumer<Object>> left;
+    private List<Consumer<Object>> right;
     private String name;
 
     public LogicBranch(final boolean condition,
-                       final List<Function<Object, Void>> left,
-                       final List<Function<Object, Void>> right) {
+                       final List<Consumer<Object>> left,
+                       final List<Consumer<Object>> right) {
         this.condition = condition;
         this.left = left;
         this.right = right;
     }
 
-    public void evaluate() {
+    @Override
+    public void accept(final Object o) {
         if (condition) {
             iterate(left);
         } else {
@@ -30,11 +31,16 @@ public class LogicBranch implements Function<Object, Void> {
         }
     }
 
-    public List<Function<Object, Void>> getLeft() {
+    @Override
+    public Consumer<Object> andThen(final Consumer<? super Object> after) {
+        return null;
+    }
+
+    public List<Consumer<Object>> getLeft() {
         return left;
     }
 
-    public void setRight(final List<Function<Object, Void>> right) {
+    public void setRight(final List<Consumer<Object>> right) {
         this.right = right;
     }
 
@@ -42,19 +48,7 @@ public class LogicBranch implements Function<Object, Void> {
         this.name = name;
     }
 
-    @Override
-    public Void apply(final Object t) {
-        return null;
-    }
-
-    private void iterate(final List<Function<Object, Void>> side) {
-        for (final Function<Object, Void> func : side) {
-            if (func instanceof LogicBranch) {
-                final LogicBranch branch = (LogicBranch) func;
-                branch.evaluate();
-            } else {
-                func.apply(null);
-            }
-        }
+    private void iterate(final List<Consumer<Object>> side) {
+        side.forEach(objectConsumer -> objectConsumer.accept(null));
     }
 }

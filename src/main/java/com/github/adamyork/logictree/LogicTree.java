@@ -2,7 +2,7 @@ package com.github.adamyork.logictree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 @SuppressWarnings("WeakerAccess")
 public class LogicTree {
@@ -18,8 +18,8 @@ public class LogicTree {
     }
 
     public LogicTree iff(final boolean condition,
-                         final Function<Object, Void> handler) {
-        final List<Function<Object, Void>> handlers = new ArrayList<>();
+                         final Consumer<Object> handler) {
+        final List<Consumer<Object>> handlers = new ArrayList<>();
         handlers.add(handler);
         final LogicBranch branch = new LogicBranch(condition, handlers, null);
         branch.setName("branch " + this.branches.size());
@@ -28,22 +28,22 @@ public class LogicTree {
     }
 
     public LogicTree thenIff(final boolean condition,
-                             final Function<Object, Void> handler) {
-        final List<Function<Object, Void>> handlers = new ArrayList<>();
+                             final Consumer<Object> handler) {
+        final List<Consumer<Object>> handlers = new ArrayList<>();
         handlers.add(handler);
         final LogicBranch branch = new LogicBranch(condition, handlers, null);
         branch.setName("branch " + branches.size());
         final LogicBranch last = branches.get(branches.size() - 1);
-        final List<Function<Object, Void>> left = last.getLeft();
+        final List<Consumer<Object>> left = last.getLeft();
         left.add(1, branch);
         branches.add(branch);
         return this;
     }
 
-    public LogicTree els(final Function<Object, Void> handler) {
+    public LogicTree els(final Consumer<Object> handler) {
         final int index = (branches.size() - 1) - terminated - handled;
         final LogicBranch b = branches.get(index);
-        final List<Function<Object, Void>> handlers = new ArrayList<>();
+        final List<Consumer<Object>> handlers = new ArrayList<>();
         handlers.add(handler);
         b.setRight(handlers);
         this.handled++;
@@ -51,14 +51,14 @@ public class LogicTree {
     }
 
     public LogicTree els(final boolean condition,
-                         final Function<Object, Void> handler) {
+                         final Consumer<Object> handler) {
         final int index = (branches.size() - 1) - terminated - handled;
-        final List<Function<Object, Void>> handlers = new ArrayList<>();
+        final List<Consumer<Object>> handlers = new ArrayList<>();
         handlers.add(handler);
         final LogicBranch branch = new LogicBranch(condition, handlers, null);
         branch.setName("branch " + branches.size());
         branches.add(branch);
-        final List<Function<Object, Void>> right = new ArrayList<>();
+        final List<Consumer<Object>> right = new ArrayList<>();
         right.add(branch);
         final LogicBranch branchAtIndex = this.branches.get(index);
         branchAtIndex.setRight(right);
@@ -72,7 +72,7 @@ public class LogicTree {
     }
 
     public void evaluate() {
-        this.branches.get(0).evaluate();
+        this.branches.get(0).accept(null);
     }
 
 }
