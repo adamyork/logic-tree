@@ -6,22 +6,23 @@ import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("unused")
 public class LogicTreeTestFive {
-    
+
     private static final boolean COND1 = true;
     private static final boolean COND2 = false;
     private static final boolean COND3 = false;
     private static final boolean COND4 = true;
     private static final boolean COND5 = false;
     private static final boolean COND6 = false;
-    
+
     @Test
-    public void testTraditionalResultsMatchTreeResults(){
+    public void testTraditionalResultsMatchTreeResults() {
         final String traditional = runTraditional();
         final String tree = runTree();
-        assertEquals(traditional,tree);
+        assertEquals(traditional, tree);
     }
-    
-    private String runTraditional(){
+
+    @SuppressWarnings("Duplicates")
+    private String runTraditional() {
         String results = "";
         if (COND1 && !COND2) {
             results += "branch1-";
@@ -43,20 +44,34 @@ public class LogicTreeTestFive {
         }
         return results;
     }
-    
-    private String runTree(){
-        LogicTreeTestHandlers.setResults("");
+
+    @SuppressWarnings({"ConstantConditions", "Duplicates"})
+    private String runTree() {
         final LogicTree tree = new LogicTree();
-        tree.iff(COND1 && !COND2, LogicTreeTestHandlers.getHandler1())
-            .thenIff(COND3, LogicTreeTestHandlers.getHandler1_1())
-            .thenIff(COND4 && !COND5, LogicTreeTestHandlers.getHandler1_1_1())
-            .thenIff(COND6, LogicTreeTestHandlers.getHandler1_1_1_1())
-            .end()
-            .els(LogicTreeTestHandlers.getHandler1_1_2())
-            .els(LogicTreeTestHandlers.getHandler1_2())
-            .els(!COND1 && COND2,LogicTreeTestHandlers.getHandler2())
-            .evaluate();
-        return LogicTreeTestHandlers.getResults();
+        final String[] results = {""};
+        tree.iff(COND1 && !COND2, o -> {
+            results[0] = results[0].concat("branch1-");
+            return null;
+        }).thenIff(COND3, o -> {
+            results[0] = results[0].concat("branch1.1-");
+            return null;
+        }).thenIff(COND4 && !COND5, o -> {
+            results[0] = results[0].concat("branch1.1.1-");
+            return null;
+        }).thenIff(COND6, o -> {
+            results[0] = results[0].concat("branch1.1.1.1-");
+            return null;
+        }).end().els(o -> {
+            results[0] = results[0].concat("branch1.1.2-");
+            return null;
+        }).els(o -> {
+            results[0] = results[0].concat("branch1.2-");
+            return null;
+        }).els(!COND1 && COND2, o -> {
+            results[0] = results[0].concat("branch2-");
+            return null;
+        }).evaluate();
+        return results[0];
     }
 
 }
